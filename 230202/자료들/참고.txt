@@ -1,0 +1,24 @@
+- https://wooono.tistory.com/103
+
+-
+f = df_top10.groupby(‘user_id’).agg({
+    ‘category_code’ : [(‘c_category_code’, lambda x: x.nunique()),
+                       (‘category_code_max’, lambda x: x.value_counts().index[0]),
+                       (‘category_code_min’, lambda x: x.value_counts().index[-1])],
+    ‘user_session’ : [(‘c_user_session’, lambda x: x.count()),
+                      (‘number_behavior’, lambda x: x.nunique())],
+    ‘product_id’ : [(‘상품종류’, lambda x: x.nunique())],
+    ‘weekday’ : [(‘weekday_max’, lambda x: max(x))],
+    ‘time’ : [(‘time_max’, lambda x: max(x))]
+})
+f.columns = f.columns.droplevel()  # 동일한 코드: f.columns = [j for _, j in f.columns]
+f=f.reset_index()
+df_user_id = df_user_id.merge(f, how=‘left’)
+
+-
+array -> list    .tolist()
+series -> list   .to_list()
+
+-
+# 수치형 변수에 대해 이상치(outlier)를 처리
+features.iloc[:,1:] = features.iloc[:,1:].apply(lambda x: x.clip(x.quantile(.05), x.quantile(.95)), axis=0)
